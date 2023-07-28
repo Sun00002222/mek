@@ -1,0 +1,384 @@
+/* https://developer.mozilla.org/ja/docs/Web/CSS/Using_CSS_custom_properties */
+:root {
+  --path-background-color: #6d6b6b;
+  --path-color: #ffffff;
+  --cell-background-color: #ffffff;
+  /* --path-background-img: url("images/background_trimmed.png");
+  --path-img: url("images/background_trimmed.png"); */
+  --animation-move-duration: 1s;
+  --animation-rotation-duration: 0.3s;
+
+  --path-color-completed: #000000;
+  /* --path-img-completed: url("images/background_trimmed.png"); */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+#game-container {
+  position: relative;
+  display: none;
+  width: 400px;
+  height: 400px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#start-text-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.start-text {
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+  animation-delay: 1s;
+}
+
+.start-text.fadeOut {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+#next-button, #start-button, #next-level-button,#shuffle-button,#over-button {
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #1e90ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#next-button:hover, #start-button:hover, #shuffle-button:hover {
+  background-color: #007BFF;
+}
+
+#message-container {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 5px;
+  font-size: 24px;
+  text-align: center;
+  z-index: 10;
+}
+
+
+/* <<<<<<< Added contents begins (23/07/17) */
+#maze {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  /* position: relative; */
+}
+
+.cell {
+  border: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  position: relative;
+  z-index: 0; /* To overlap */
+  background-color: var(--cell-background-color);
+}
+
+.path-background {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* To overlap */
+  /* background-image: var(--path-background-img);
+  background-size: cover;
+  background-position: center; */
+  background-color: var(--path-background-color);
+  position: absolute;
+  /* cursor: pointer; */
+}
+
+.path {
+  background-color: lightblue;
+}
+
+/* The cell for the points of start */
+.cell-start::after {
+  content: "";
+  width: 50%;
+  height: 20%;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  position: relative;
+  right: 25%;
+  z-index: 2; /* To overlap */
+  background-color: var(--path-color);
+  /* background-image: var(--path-img);
+  background-size: 200% auto;
+  background-position: left; */
+}
+
+.cell-start-completed::after {
+  background-color: var(--path-color-completed);
+  /* background-image: var(--path-img-completed);
+  background-size: 200% auto;
+  background-position: left; */
+}
+
+/* The cell for the points of goal */
+.cell-goal::after {
+  content: "";
+  width: 50%;
+  height: 20%;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  position: relative;
+  left: 25%;
+  z-index: 2; /* To overlap */
+  background-color: var(--path-color);
+  /* background-image: var(--path-background-img);
+  background-size: 200% auto;
+  background-position: right; */
+}
+
+.cell-goal-completed::after {
+  background-color: var(--path-color-completed);
+  /* background-image: var(--path-img-completed);
+  background-size: 200% auto;
+  background-position: left; */
+}
+
+/* The second type of cell */
+.cell-0::after {
+  content: "";
+  width: 100%;
+  height: 20%;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  z-index: 2; /* To overlap */
+  background-color: var(--path-color);
+  /* background-image: var(--path-background-img);
+  background-size: cover;
+  background-position: left; */
+}
+
+.cell-0-completed::after {
+  background-color: var(--path-color-completed);
+  /* background-image: var(--path-img-completed);
+  background-size: 200% auto;
+  background-position: left; */
+}
+
+/* The third type of cell */
+.cell-1::before {
+  content: "";
+  width: 60%;
+  height: 60%;
+  border: 1px solid black;
+  border-top: none;
+  border-right: none;
+  position: relative;
+  bottom: 20%;
+  left: 40%;
+  z-index: 2; /* To overlap */
+  background-color: var(--path-color);
+  /* background-image: var(--path-background-img);
+  background-size: 167%;
+  background-position: bottom; */
+}
+
+.cell-1::after {
+  content: "";
+  width: 40%;
+  height: 40%;
+  border: 1px solid black;
+  border-top: none;
+  border-right: none;
+  position: relative;
+  bottom: 30%;
+  z-index: 3; /* To overlap */
+  /* background-image: var(--path-background-img);
+  background-size: 250% auto;
+  background-position: left 100% bottom 100%; */
+  background-color: var(--path-background-color);
+}
+
+.cell-1-completed::before {
+  background-color: var(--path-color-completed);
+  /* background-image: var(--path-img-completed);
+  background-size: 200% auto;
+  background-position: left; */
+}
+
+#explorer {
+  width: 35%;
+  height: auto;
+  position: absolute;
+  z-index: 5;
+  pointer-events: none; /* Disable pointer event ("click event" in this case) */
+}
+
+@keyframes upAnimation {
+/* 0% { transform: translateY(0%); } */
+100% { transform: translateY(-200%); } /* translateY is affected by height (#explorer) */
+}
+
+@keyframes rightAnimation {
+/* 0% { transform: translateY(0%); } */
+100% { transform: translateX(286%); } /* translateX is affected by width (#explorer) */
+}
+
+@keyframes leftAnimation {
+/* 0% { transform: translateY(0%); } */
+100% { transform: translateX(-286%); } /* translateX is affected by width (#explorer) -> translateX = 100*(100/width) */
+}
+
+@keyframes downAnimation {
+/* 0% { transform: translateY(0%); } */
+100% { transform: translateY(200%); } /* translateY is affected by height (#explorer) */
+}
+
+.explorerMoveUp {
+animation-name: upAnimation;
+animation-duration: var(--animation-move-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.explorerMoveRight {
+animation-name: rightAnimation;
+animation-duration: var(--animation-move-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.explorerMoveLeft {
+animation-name: leftAnimation;
+animation-duration: var(--animation-move-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.explorerMoveDown {
+animation-name: downAnimation;
+animation-duration: var(--animation-move-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+@keyframes rotateAnimationFrom0To90Deg {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(90deg); }
+}
+
+@keyframes rotateAnimationFrom90To180Deg {
+0% { transform: rotate(90deg); }
+100% { transform: rotate(180deg); }
+}
+
+@keyframes rotateAnimationFrom180To270Deg {
+0% { transform: rotate(180deg); }
+100% { transform: rotate(270deg); }
+}
+
+@keyframes rotateAnimationFrom270To360Deg {
+0% { transform: rotate(270deg); }
+100% { transform: rotate(360deg); }
+}
+
+.rotateFrom0To90Deg {
+animation-name: rotateAnimationFrom0To90Deg;
+animation-duration: var(--animation-rotation-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.rotateFrom90To180Deg {
+animation-name: rotateAnimationFrom90To180Deg;
+animation-duration: var(--animation-rotation-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.rotateFrom180To270Deg {
+animation-name: rotateAnimationFrom180To270Deg;
+animation-duration: var(--animation-rotation-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+
+.rotateFrom270To360Deg {
+animation-name: rotateAnimationFrom270To360Deg;
+animation-duration: var(--animation-rotation-duration);
+animation-fill-mode: forwards; /* Maintain the state at 100% when ending the animation. */
+}
+/* ============ Added contents ends(23/07/17) ============ */
+
+/* ============ Added contents begins (23/07/18) ============ */
+/* Add "pointer-events: none;" to "#explorer" */
+#flag {
+  width: 40%;
+  height: 40%;
+  position: absolute;
+  top: 23%; left: 20%;
+  z-index: 5;
+  pointer-events: none; /* Disable pointer event ("click event" in this case) */
+}
+
+.border-color {
+  border: 3px solid #4a2ae8;
+}
+/* ============ Added contents ends(23/07/18) ============ */
+
+/* ============ Added contents begins (23/07/22) ============ */
+.event-disabled {
+  pointer-events: none;
+}
+/* ============ Added contents ends(23/07/22) ============ */
+
+
